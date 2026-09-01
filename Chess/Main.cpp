@@ -22,7 +22,7 @@ int main() {
   
        
        // TheMovementOfPieces(Bpieces, BoardG, Wpieces);
-        TheMovementOfPieces(Wpieces, &BoardG, Bpieces);
+       // TheMovementOfPieces(Wpieces, &BoardG, Bpieces);
         
 
         EndDrawing();
