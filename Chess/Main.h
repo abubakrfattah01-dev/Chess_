@@ -9,7 +9,7 @@
 * 2- the special move castling is not implemented
 * 3- the special move en passant is not implemented
 * 4- the special move promotion is not implemented
-* 5- the capture of pieces is not implemented
+* 5- the capture of pieces is not implemented***
 * 6- the check and checkmate rules are not implemented
 * 7- the stalemate rule is not implemented
 * 8- the draw by repetition rule is not implemented

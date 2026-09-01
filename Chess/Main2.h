@@ -234,7 +234,9 @@ __RecMin* SelectPosition(
 };
 
 #pragma endregion
+
 #pragma region movement 
+
 void TheRulesofcapture(
 	Piece* CurrentPiece,
 	Piece SetofPiece[]
@@ -259,8 +261,10 @@ bool IsTherePieceInPath(
 	int16_t DeltaX = static_cast<int16_t> (MP->pos >> *MPos);
 	int16_t DeltaY = static_cast<int16_t> (MP->pos << *MPos);
 	__RecMin rc = { 0 };
+
 	int16_t X = MP->pos.x + DeltaX;
 	int16_t Y = MP->pos.y + DeltaY;
+
 	for (;((X > MPos->x) || (X < MPos->x) || (MP->pos.x == MPos->x))
 		&& ((Y > MPos->y) || (Y < MPos->y) || (MP->pos.y == MPos->y));X += DeltaX, Y += DeltaY)
 	{
