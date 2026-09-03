@@ -20,11 +20,17 @@ int main() {
         DrawAllPieces(Wpieces,Bpieces);
 
   
-       
-      // TheMovementOfPieces(Bpieces, &BoardG, Wpieces);
-       TheMovementOfPieces(Wpieces, &BoardG, Bpieces);
+        if (CurrentGameState == Player_One_Turn) {
+            if (TheMovementOfPieces(Wpieces, &BoardG, Bpieces, CurrentGameState)) {
+                CurrentGameState = Player_Two_Turn;
+            }
+        }
         
-
+       if (CurrentGameState == Player_Two_Turn) {
+          if (TheMovementOfPieces(Bpieces, &BoardG, Wpieces, CurrentGameState)) {
+            CurrentGameState = Player_One_Turn;
+          }
+       }
         EndDrawing();
     }
     CloseWindow();

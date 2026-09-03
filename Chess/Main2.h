@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <stdint.h>
 #include <string>
+
 #define	IsMousePressed (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)|| IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 
 constexpr int Pixel = 90;
@@ -42,10 +43,10 @@ typedef enum PieceState {
 }__State;
 
 typedef enum GameState {
-	player_One_In_check,
-	player_Two_In_check,
 	Player_One_Turn,
 	Player_Two_Turn,
+	player_One_In_check,
+	player_Two_In_check,
 	Player_One_Win,
 	Player_Two_Win,
 	Stalemate,
@@ -168,16 +169,16 @@ void Init_16Piece(
 	Piece Setof16Piece[],
 	bool TypeofSet
 ) {
-	Setof16Piece[0].__Set((TypeofSet) ? Board->_Board[1][0] : Board->_Board[6][0], (TypeofSet) ? _Wp : _Bp);
-	Setof16Piece[1].__Set((TypeofSet) ? Board->_Board[1][1] : Board->_Board[6][1], (TypeofSet) ? _Wp : _Bp);
-	Setof16Piece[2].__Set((TypeofSet) ? Board->_Board[1][2] : Board->_Board[6][2], (TypeofSet) ? _Wp : _Bp);
-	Setof16Piece[3].__Set((TypeofSet) ? Board->_Board[1][3] : Board->_Board[6][3], (TypeofSet) ? _Wp : _Bp);
-	Setof16Piece[4].__Set((TypeofSet) ? Board->_Board[1][4] : Board->_Board[6][4], (TypeofSet) ? _Wp : _Bp);
-	Setof16Piece[5].__Set((TypeofSet) ? Board->_Board[1][5] : Board->_Board[6][5], (TypeofSet) ? _Wp : _Bp);
-	Setof16Piece[6].__Set((TypeofSet) ? Board->_Board[1][6] : Board->_Board[6][6], (TypeofSet) ? _Wp : _Bp);
-	Setof16Piece[7].__Set((TypeofSet) ? Board->_Board[1][7] : Board->_Board[6][7], (TypeofSet) ? _Wp : _Bp);
-	Setof16Piece[8].__Set((TypeofSet) ? Board->_Board[0][0] : Board->_Board[7][0], (TypeofSet) ? _Wr : _Br);
-	Setof16Piece[9].__Set((TypeofSet) ? Board->_Board[0][1] : Board->_Board[7][1], (TypeofSet) ? _Wn : _Bn);
+	 Setof16Piece[0].__Set((TypeofSet) ? Board->_Board[1][0] : Board->_Board[6][0], (TypeofSet) ? _Wp : _Bp);
+	 Setof16Piece[1].__Set((TypeofSet) ? Board->_Board[1][1] : Board->_Board[6][1], (TypeofSet) ? _Wp : _Bp);
+	 Setof16Piece[2].__Set((TypeofSet) ? Board->_Board[1][2] : Board->_Board[6][2], (TypeofSet) ? _Wp : _Bp);
+	 Setof16Piece[3].__Set((TypeofSet) ? Board->_Board[1][3] : Board->_Board[6][3], (TypeofSet) ? _Wp : _Bp);
+	 Setof16Piece[4].__Set((TypeofSet) ? Board->_Board[1][4] : Board->_Board[6][4], (TypeofSet) ? _Wp : _Bp);
+	 Setof16Piece[5].__Set((TypeofSet) ? Board->_Board[1][5] : Board->_Board[6][5], (TypeofSet) ? _Wp : _Bp);
+	 Setof16Piece[6].__Set((TypeofSet) ? Board->_Board[1][6] : Board->_Board[6][6], (TypeofSet) ? _Wp : _Bp);
+	 Setof16Piece[7].__Set((TypeofSet) ? Board->_Board[1][7] : Board->_Board[6][7], (TypeofSet) ? _Wp : _Bp);
+	 Setof16Piece[8].__Set((TypeofSet) ? Board->_Board[0][0] : Board->_Board[7][0], (TypeofSet) ? _Wr : _Br);
+	 Setof16Piece[9].__Set((TypeofSet) ? Board->_Board[0][1] : Board->_Board[7][1], (TypeofSet) ? _Wn : _Bn);
 	Setof16Piece[10].__Set((TypeofSet) ? Board->_Board[0][2] : Board->_Board[7][2], (TypeofSet) ? _Wb : _Bb);
 	Setof16Piece[11].__Set((TypeofSet) ? Board->_Board[0][3] : Board->_Board[7][3], (TypeofSet) ? _Wk : _Bk);
 	Setof16Piece[12].__Set((TypeofSet) ? Board->_Board[0][4] : Board->_Board[7][4], (TypeofSet) ? _Wq : _Bq);
@@ -245,6 +246,17 @@ void TheRulesofChecks(
 {
   
 };
+bool IstherePieceHere(
+	__RecMin* po_s,
+	Piece SetofPiece2[]
+) {
+	for (int i = 0; i < 16;i++) {
+		if (SetofPiece2[i].pos == *po_s) {
+			return true;
+		}
+	}
+	return false;
+}
 void TheRulesofcapture(
 	Piece* CurrentPiece,
 	Piece SetofPiece[]  
@@ -303,23 +315,33 @@ bool IsTherePieceInPath(
 }
 bool TheRulesOfMovement(
 	Piece* CurrentPiece,
-	__RecMin* TheSelectedPosition
+	__RecMin* TheSelectedPosition,
+	Piece SetofPiece2[],
+	Piece SetofPiece[]
 )
 {
 	int16_t DeltaX = static_cast<int16_t> (abs(CurrentPiece->pos.x - TheSelectedPosition->x));
 	int16_t DeltaY = static_cast<int16_t> (abs(CurrentPiece->pos.y - TheSelectedPosition->y));
-	int16_t PDelta = static_cast<int16_t>     (CurrentPiece->pos.y - TheSelectedPosition->y);
+	int16_t PDeltaY = static_cast<int16_t>     (CurrentPiece->pos.y - TheSelectedPosition->y);
+	
 	switch (CurrentPiece->typ) {
 
 	case _Wp:
 		if (!(CurrentPiece->IsMoved)) {
 			if (DeltaX == 0 &&
-				((PDelta == Pixel) || (PDelta == 2 * Pixel))) {
+				((PDeltaY == Pixel) || (PDeltaY == 2 * Pixel))) {
+				return true;
+			}
+			else if (DeltaX == 0 && PDeltaY == Pixel) {
 				return true;
 			}
 		}
 		else {
-			if (DeltaX == 0 && PDelta == Pixel) {
+             
+			if (DeltaX == 0 && PDeltaY == Pixel) {
+				return true;
+			}
+			else if (DeltaX == Pixel && PDeltaY == Pixel && IstherePieceHere(TheSelectedPosition,SetofPiece2)) {
 				return true;
 			}
 		}
@@ -328,12 +350,13 @@ bool TheRulesOfMovement(
 	case _Bp:
 		if (!(CurrentPiece->IsMoved)) {
 			if (DeltaX == 0 &&
-				((PDelta == -(Pixel)) || (PDelta == (-2) * Pixel))) {
+				((PDeltaY == -(Pixel)) || (PDeltaY == (-2) * Pixel))) {
 				return true;
 			}
+		
 		}
 		else {
-			if (DeltaX == 0 && PDelta == -(Pixel)) {
+			if (DeltaX == 0 && PDeltaY == -(Pixel)) {
 				return true;
 			}
 		}
@@ -391,7 +414,7 @@ bool TheRulesOfMovement(
 
 	return false;
 }
-bool TheMovementOfPieces(
+bool TheMovementOfPieces( 
 	Piece Setof16Piece[],
 	Board * BoardofChess_8X8size,
 	Piece Setof16Piece2[],
@@ -405,14 +428,20 @@ bool TheMovementOfPieces(
 	NewPiece = SelectPiece(Setof16Piece);
 
 	if (NewPiece != nullptr) {
-		if (CurrentPiece != nullptr) { CurrentPiece->state = Active; }
+
+		if (CurrentPiece != nullptr) {
+			
+		    if (CurrentPiece != NewPiece) {
+				CurrentPiece->state = Active;
+			}
+		}
 		CurrentPiece = NewPiece;
 	}
 
 	if (CurrentPiece != nullptr) {
 		TheSelectedPosition = SelectPosition(*BoardofChess_8X8size);
 		if (TheSelectedPosition != nullptr && (CurrentPiece->pos != *TheSelectedPosition) &&
-			TheRulesOfMovement(CurrentPiece, TheSelectedPosition) &&
+			TheRulesOfMovement(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece) &&
 			IsTherePieceInPath(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece)) {
 			
 			CurrentPiece->IsMoved = true;
