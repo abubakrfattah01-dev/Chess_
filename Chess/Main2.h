@@ -42,7 +42,8 @@ typedef enum PieceState {
 }__State;
 
 typedef enum GameState {
-
+	player_One_In_check,
+	player_Two_In_check,
 	Player_One_Turn,
 	Player_Two_Turn,
 	Player_One_Win,
@@ -236,10 +237,17 @@ __RecMin* SelectPosition(
 #pragma endregion
 
 #pragma region movement 
-
+void TheRulesofChecks(
+	Piece* CurrentPiece,
+	Piece SetofPiece2[],
+	__Game* CurrentGameState
+)
+{
+  
+};
 void TheRulesofcapture(
 	Piece* CurrentPiece,
-	Piece SetofPiece[]
+	Piece SetofPiece[]  
 ) {
 	for (int i = 0; i < 16;i++) {
 		if (SetofPiece[i].pos == CurrentPiece->pos) {
@@ -386,9 +394,10 @@ bool TheRulesOfMovement(
 bool TheMovementOfPieces(
 	Piece Setof16Piece[],
 	Board * BoardofChess_8X8size,
-	Piece Setof16Piece2[]
-) {
+	Piece Setof16Piece2[],
+	__Game CurrentGameState
 
+) {
 	static Piece* CurrentPiece = nullptr; // Pointer_toPieceHadBeenSelected
 	Piece* NewPiece = nullptr; //Pointer_toPieceSelectedNow 
 	__RecMin* TheSelectedPosition = nullptr;
@@ -417,6 +426,8 @@ bool TheMovementOfPieces(
 
 	return false;
 }
+
+
 
 #pragma endregion 
 

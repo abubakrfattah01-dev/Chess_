@@ -8,7 +8,7 @@ int main() {
     SetWindowIcon(Icon);
     UnloadImage(Icon);
     Board BoardG;
-   // __Game turnG = Player_One_Turn;
+    __Game CurrentGameState = Player_One_Turn;
     Piece Bpieces[16], Wpieces[16];
     Init_16Piece(&BoardG, Wpieces, 1);
     Init_16Piece(&BoardG, Bpieces, 0);
@@ -21,8 +21,8 @@ int main() {
 
   
        
-       // TheMovementOfPieces(Bpieces, BoardG, Wpieces);
-       // TheMovementOfPieces(Wpieces, &BoardG, Bpieces);
+      // TheMovementOfPieces(Bpieces, &BoardG, Wpieces);
+       TheMovementOfPieces(Wpieces, &BoardG, Bpieces);
         
 
         EndDrawing();
