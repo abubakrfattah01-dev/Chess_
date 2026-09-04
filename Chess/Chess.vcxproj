@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="Main.h" />
     <ClInclude Include="Main2.h" />
+    <ClInclude Include="Rework.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

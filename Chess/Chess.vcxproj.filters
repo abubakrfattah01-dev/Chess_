@@ -32,5 +32,8 @@
     <ClInclude Include="Main2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Rework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

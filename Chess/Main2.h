@@ -7,10 +7,10 @@
 constexpr int Pixel = 90;
 
 namespace Window {
-	const char* Icon_local = "picecs\\wn.png";
+	const char* Title = "Chess Game";
 	constexpr int SrcWidth = (Pixel * 8);
 	constexpr int SrcHeigth = (Pixel * 8);
-	const char* Title = "Chess Game";
+	const char* Icon_local = "picecs\\wn.png";
 }
 
 constexpr Color PieceSelectColor = { 74,84,45,255 };
@@ -215,7 +215,7 @@ Piece* SelectPiece(
 	Piece SetofPieces_16_Piece[]
 ) {
 	for (int indexofPiece = 0; indexofPiece < 16; indexofPiece++) {
-		if (IsMousePressed && SetofPieces_16_Piece[indexofPiece].pos.CheckRecMinVec(GetMousePosition())) {
+		if (IsMousePressed && SetofPieces_16_Piece[indexofPiece].pos.CheckRecMinVec(GetMousePosition())&& SetofPieces_16_Piece[indexofPiece].state != UnActive) {
 			SetofPieces_16_Piece[indexofPiece].state = Selected;
 			return &SetofPieces_16_Piece[indexofPiece];
 		}
@@ -238,6 +238,7 @@ __RecMin* SelectPosition(
 #pragma endregion
 
 #pragma region movement 
+/*
 void TheRulesofChecks(
 	Piece* CurrentPiece,
 	Piece SetofPiece2[],
@@ -256,19 +257,7 @@ bool IstherePieceHere(
 		}
 	}
 	return false;
-}
-void TheRulesofcapture(
-	Piece* CurrentPiece,
-	Piece SetofPiece[]  
-) {
-	for (int i = 0; i < 16;i++) {
-		if (SetofPiece[i].pos == CurrentPiece->pos) {
-			SetofPiece[i].state = UnActive;
-			return;
-		}
-	}
-	return;
-}
+}*/
 bool IsTherePieceInPath(
 	Piece* MP,
 	__RecMin* MPos,
@@ -313,6 +302,19 @@ bool IsTherePieceInPath(
 
 	return true;
 }
+
+void TheRulesofcapture(
+	__RecMin * pos,
+	Piece SetofPiece[]  
+) {
+	for (int i = 0; i < 16;i++) {
+		if (SetofPiece[i].pos == *pos) {
+			SetofPiece[i].state = UnActive;
+			return;
+		}
+	}
+	return;
+}
 bool TheRulesOfMovement(
 	Piece* CurrentPiece,
 	__RecMin* TheSelectedPosition,
@@ -332,7 +334,7 @@ bool TheRulesOfMovement(
 				((PDeltaY == Pixel) || (PDeltaY == 2 * Pixel))) {
 				return true;
 			}
-			else if (DeltaX == 0 && PDeltaY == Pixel) {
+			else if (DeltaX == 0 && PDeltaY == Pixel ) {
 				return true;
 			}
 		}
@@ -341,7 +343,7 @@ bool TheRulesOfMovement(
 			if (DeltaX == 0 && PDeltaY == Pixel) {
 				return true;
 			}
-			else if (DeltaX == Pixel && PDeltaY == Pixel && IstherePieceHere(TheSelectedPosition,SetofPiece2)) {
+			else if (DeltaX == Pixel && PDeltaY == Pixel ) {
 				return true;
 			}
 		}
@@ -349,34 +351,21 @@ bool TheRulesOfMovement(
 		//BPawn
 	case _Bp:
 		if (!(CurrentPiece->IsMoved)) {
-			if (DeltaX == 0 &&
-				((PDeltaY == -(Pixel)) || (PDeltaY == (-2) * Pixel))) {
-				return true;
-			}
-		
-		}
-		else {
-			if (DeltaX == 0 && PDeltaY == -(Pixel)) {
+			if (DeltaX == 0 && ((PDeltaY == -(Pixel)) || (PDeltaY == (-2) * Pixel))) {
 				return true;
 			}
 		}
+		else { if (DeltaX == 0 && PDeltaY == -(Pixel)) {return true;}}
 		break;
 		//Bioshp
 	case _Wb:
 	case _Bb:
-		if (DeltaX == DeltaY)
-		{
-			return true;
-		}
+		if (DeltaX == DeltaY) {return true;}
 		break;
 		//King
 	case _Wk:
 	case _Bk:
-		if ((DeltaX == Pixel || DeltaX == 0) &&
-			(DeltaY == Pixel || DeltaY == 0))
-		{
-			return true;
-		}
+		if ((DeltaX == Pixel || DeltaX == 0) && (DeltaY == Pixel || DeltaY == 0)){return true;}
 		break;
 		//Queen
 	case _Wq:
@@ -384,31 +373,17 @@ bool TheRulesOfMovement(
 		if (DeltaX == DeltaY) {
 			return true;
 		}
-		else if ((DeltaX == 0 && DeltaY != 0) ||
-			(DeltaY == 0 && DeltaX != 0))
-		{
-			return true;
-		}
-
+		else if ((DeltaX == 0 && DeltaY != 0) || (DeltaY == 0 && DeltaX != 0)){	return true; }
 		break;
 		//King
 	case _Wr:
 	case _Br:
-		if ((DeltaX == 0 && DeltaY != 0) ||
-			(DeltaY == 0 && DeltaX != 0))
-		{
-			return true;
-		}
-
+		if ((DeltaX == 0 && DeltaY != 0) || (DeltaY == 0 && DeltaX != 0)){return true;}
 		break;
 		//Knight
 	case _Wn:
 	case _Bn:
-		if (DeltaX == 2 * Pixel && DeltaY == Pixel ||
-			(DeltaX == Pixel && DeltaY == 2 *Pixel))
-		{
-			return true;
-		}
+		if (DeltaX == 2 * Pixel && DeltaY == Pixel || (DeltaX == Pixel && DeltaY == 2 *Pixel)){return true;}
 		break;
 	}
 
@@ -430,12 +405,11 @@ bool TheMovementOfPieces(
 	if (NewPiece != nullptr) {
 
 		if (CurrentPiece != nullptr) {
-			
-		    if (CurrentPiece != NewPiece) {
-				CurrentPiece->state = Active;
-			}
+			CurrentPiece->state = Active;
 		}
+
 		CurrentPiece = NewPiece;
+		CurrentPiece->state = Selected;
 	}
 
 	if (CurrentPiece != nullptr) {
@@ -444,10 +418,10 @@ bool TheMovementOfPieces(
 			TheRulesOfMovement(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece) &&
 			IsTherePieceInPath(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece)) {
 			
+			TheRulesofcapture(TheSelectedPosition, Setof16Piece2);
 			CurrentPiece->IsMoved = true;
 			CurrentPiece->pos = *TheSelectedPosition;
 			CurrentPiece->state = Active;
-			TheRulesofcapture(CurrentPiece, Setof16Piece2);
 			CurrentPiece = nullptr;
 			return true;
 		}
