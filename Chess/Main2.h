@@ -156,10 +156,11 @@ public:
 		}
 
 		Image TEX = LoadImage(path.c_str());
-			// Add this default ctor to explicitly initialize members
+		// Add this default ctor to explicitly initialize members
 		ImageResize(&TEX, Pixel, Pixel);
 		this->tex = LoadTextureFromImage(TEX);
-		UnloadImage(TEX);};	
+		UnloadImage(TEX);
+	};
 };
 
 #pragma region Piecese
@@ -169,16 +170,16 @@ void Init_16Piece(
 	Piece Setof16Piece[],
 	bool TypeofSet
 ) {
-	 Setof16Piece[0].__Set((TypeofSet) ? Board->_Board[1][0] : Board->_Board[6][0], (TypeofSet) ? _Wp : _Bp);
-	 Setof16Piece[1].__Set((TypeofSet) ? Board->_Board[1][1] : Board->_Board[6][1], (TypeofSet) ? _Wp : _Bp);
-	 Setof16Piece[2].__Set((TypeofSet) ? Board->_Board[1][2] : Board->_Board[6][2], (TypeofSet) ? _Wp : _Bp);
-	 Setof16Piece[3].__Set((TypeofSet) ? Board->_Board[1][3] : Board->_Board[6][3], (TypeofSet) ? _Wp : _Bp);
-	 Setof16Piece[4].__Set((TypeofSet) ? Board->_Board[1][4] : Board->_Board[6][4], (TypeofSet) ? _Wp : _Bp);
-	 Setof16Piece[5].__Set((TypeofSet) ? Board->_Board[1][5] : Board->_Board[6][5], (TypeofSet) ? _Wp : _Bp);
-	 Setof16Piece[6].__Set((TypeofSet) ? Board->_Board[1][6] : Board->_Board[6][6], (TypeofSet) ? _Wp : _Bp);
-	 Setof16Piece[7].__Set((TypeofSet) ? Board->_Board[1][7] : Board->_Board[6][7], (TypeofSet) ? _Wp : _Bp);
-	 Setof16Piece[8].__Set((TypeofSet) ? Board->_Board[0][0] : Board->_Board[7][0], (TypeofSet) ? _Wr : _Br);
-	 Setof16Piece[9].__Set((TypeofSet) ? Board->_Board[0][1] : Board->_Board[7][1], (TypeofSet) ? _Wn : _Bn);
+	Setof16Piece[0].__Set((TypeofSet) ? Board->_Board[1][0] : Board->_Board[6][0], (TypeofSet) ? _Wp : _Bp);
+	Setof16Piece[1].__Set((TypeofSet) ? Board->_Board[1][1] : Board->_Board[6][1], (TypeofSet) ? _Wp : _Bp);
+	Setof16Piece[2].__Set((TypeofSet) ? Board->_Board[1][2] : Board->_Board[6][2], (TypeofSet) ? _Wp : _Bp);
+	Setof16Piece[3].__Set((TypeofSet) ? Board->_Board[1][3] : Board->_Board[6][3], (TypeofSet) ? _Wp : _Bp);
+	Setof16Piece[4].__Set((TypeofSet) ? Board->_Board[1][4] : Board->_Board[6][4], (TypeofSet) ? _Wp : _Bp);
+	Setof16Piece[5].__Set((TypeofSet) ? Board->_Board[1][5] : Board->_Board[6][5], (TypeofSet) ? _Wp : _Bp);
+	Setof16Piece[6].__Set((TypeofSet) ? Board->_Board[1][6] : Board->_Board[6][6], (TypeofSet) ? _Wp : _Bp);
+	Setof16Piece[7].__Set((TypeofSet) ? Board->_Board[1][7] : Board->_Board[6][7], (TypeofSet) ? _Wp : _Bp);
+	Setof16Piece[8].__Set((TypeofSet) ? Board->_Board[0][0] : Board->_Board[7][0], (TypeofSet) ? _Wr : _Br);
+	Setof16Piece[9].__Set((TypeofSet) ? Board->_Board[0][1] : Board->_Board[7][1], (TypeofSet) ? _Wn : _Bn);
 	Setof16Piece[10].__Set((TypeofSet) ? Board->_Board[0][2] : Board->_Board[7][2], (TypeofSet) ? _Wb : _Bb);
 	Setof16Piece[11].__Set((TypeofSet) ? Board->_Board[0][3] : Board->_Board[7][3], (TypeofSet) ? _Wk : _Bk);
 	Setof16Piece[12].__Set((TypeofSet) ? Board->_Board[0][4] : Board->_Board[7][4], (TypeofSet) ? _Wq : _Bq);
@@ -215,7 +216,7 @@ Piece* SelectPiece(
 	Piece SetofPieces_16_Piece[]
 ) {
 	for (int indexofPiece = 0; indexofPiece < 16; indexofPiece++) {
-		if (IsMousePressed && SetofPieces_16_Piece[indexofPiece].pos.CheckRecMinVec(GetMousePosition())&& SetofPieces_16_Piece[indexofPiece].state != UnActive) {
+		if (IsMousePressed && SetofPieces_16_Piece[indexofPiece].pos.CheckRecMinVec(GetMousePosition()) && SetofPieces_16_Piece[indexofPiece].state != UnActive) {
 			SetofPieces_16_Piece[indexofPiece].state = Selected;
 			return &SetofPieces_16_Piece[indexofPiece];
 		}
@@ -238,14 +239,13 @@ __RecMin* SelectPosition(
 #pragma endregion
 
 #pragma region movement 
-/*
 void TheRulesofChecks(
 	Piece* CurrentPiece,
 	Piece SetofPiece2[],
 	__Game* CurrentGameState
 )
 {
-  
+
 };
 bool IstherePieceHere(
 	__RecMin* po_s,
@@ -257,7 +257,7 @@ bool IstherePieceHere(
 		}
 	}
 	return false;
-}*/
+}
 bool IsTherePieceInPath(
 	Piece* MP,
 	__RecMin* MPos,
@@ -302,10 +302,9 @@ bool IsTherePieceInPath(
 
 	return true;
 }
-
 void TheRulesofcapture(
-	__RecMin * pos,
-	Piece SetofPiece[]  
+	__RecMin* pos,
+	Piece SetofPiece[]
 ) {
 	for (int i = 0; i < 16;i++) {
 		if (SetofPiece[i].pos == *pos) {
@@ -334,16 +333,16 @@ bool TheRulesOfMovement(
 				((PDeltaY == Pixel) || (PDeltaY == 2 * Pixel))) {
 				return true;
 			}
-			else if (DeltaX == 0 && PDeltaY == Pixel ) {
+			else if (DeltaX == 0 && PDeltaY == Pixel) {
 				return true;
 			}
 		}
 		else {
-             
+
 			if (DeltaX == 0 && PDeltaY == Pixel) {
 				return true;
 			}
-			else if (DeltaX == Pixel && PDeltaY == Pixel ) {
+			else if (DeltaX == Pixel && PDeltaY == Pixel) {
 				return true;
 			}
 		}
@@ -355,17 +354,22 @@ bool TheRulesOfMovement(
 				return true;
 			}
 		}
-		else { if (DeltaX == 0 && PDeltaY == -(Pixel)) {return true;}}
+		else {
+			if (DeltaX == 0 && PDeltaY == -(Pixel)) { return true; }
+			else if (DeltaX == (Pixel) && PDeltaY == (-Pixel)) {
+				return true;
+			}
+		}
 		break;
 		//Bioshp
 	case _Wb:
 	case _Bb:
-		if (DeltaX == DeltaY) {return true;}
+		if (DeltaX == DeltaY) { return true; }
 		break;
 		//King
 	case _Wk:
 	case _Bk:
-		if ((DeltaX == Pixel || DeltaX == 0) && (DeltaY == Pixel || DeltaY == 0)){return true;}
+		if ((DeltaX == Pixel || DeltaX == 0) && (DeltaY == Pixel || DeltaY == 0)) { return true; }
 		break;
 		//Queen
 	case _Wq:
@@ -373,25 +377,25 @@ bool TheRulesOfMovement(
 		if (DeltaX == DeltaY) {
 			return true;
 		}
-		else if ((DeltaX == 0 && DeltaY != 0) || (DeltaY == 0 && DeltaX != 0)){	return true; }
+		else if ((DeltaX == 0 && DeltaY != 0) || (DeltaY == 0 && DeltaX != 0)) { return true; }
 		break;
 		//King
 	case _Wr:
 	case _Br:
-		if ((DeltaX == 0 && DeltaY != 0) || (DeltaY == 0 && DeltaX != 0)){return true;}
+		if ((DeltaX == 0 && DeltaY != 0) || (DeltaY == 0 && DeltaX != 0)) { return true; }
 		break;
 		//Knight
 	case _Wn:
 	case _Bn:
-		if (DeltaX == 2 * Pixel && DeltaY == Pixel || (DeltaX == Pixel && DeltaY == 2 *Pixel)){return true;}
+		if (DeltaX == 2 * Pixel && DeltaY == Pixel || (DeltaX == Pixel && DeltaY == 2 * Pixel)) { return true; }
 		break;
 	}
 
 	return false;
 }
-bool TheMovementOfPieces( 
+bool TheMovementOfPieces(
 	Piece Setof16Piece[],
-	Board * BoardofChess_8X8size,
+	Board* BoardofChess_8X8size,
 	Piece Setof16Piece2[],
 	__Game CurrentGameState
 
@@ -417,7 +421,7 @@ bool TheMovementOfPieces(
 		if (TheSelectedPosition != nullptr && (CurrentPiece->pos != *TheSelectedPosition) &&
 			TheRulesOfMovement(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece) &&
 			IsTherePieceInPath(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece)) {
-			
+
 			TheRulesofcapture(TheSelectedPosition, Setof16Piece2);
 			CurrentPiece->IsMoved = true;
 			CurrentPiece->pos = *TheSelectedPosition;
@@ -429,9 +433,6 @@ bool TheMovementOfPieces(
 
 	return false;
 }
-
-
-
 #pragma endregion 
 
 
