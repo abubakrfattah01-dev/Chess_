@@ -21,13 +21,13 @@ int main() {
 
 
 		if (CurrentGameState == Player_One_Turn) {
-			if (TheMovementOfPieces(Wpieces, &BoardG, Bpieces, CurrentGameState)) {
+			if (TheMovementOfPieces(Wpieces, &BoardG, Bpieces, &CurrentGameState)) {
 				CurrentGameState = Player_Two_Turn;
 			}
 		}
 
 		else if (CurrentGameState == Player_Two_Turn) {
-			if (TheMovementOfPieces(Bpieces, &BoardG, Wpieces, CurrentGameState)) {
+			if (TheMovementOfPieces(Bpieces, &BoardG, Wpieces, &CurrentGameState)) {
 				CurrentGameState = Player_One_Turn;
 			}
 		}

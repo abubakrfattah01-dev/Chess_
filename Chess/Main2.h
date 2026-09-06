@@ -261,48 +261,40 @@ bool IstherePieceHere(
 	}
 	return false;
 }
-bool IsTherePieceInPath(
-	Piece* MP,
-	__RecMin* MPos,
-	Piece SetP[],
-	Piece SetP2[]
+/////////////////////////////////////////////
+bool IsTheMovePossible(
+	Piece* TheCurrentPiece,
+	__RecMin* TheSelectedPosition,
+	Piece SetofPiece[],
+	Piece SetofPiece2[]
 ) {
-	if (MP->typ == _Wn) {
+	if (TheCurrentPiece->typ == _Wn) {
 		return true;
 	}
-	int16_t DeltaX = static_cast<int16_t> (MP->pos >> *MPos);
-	int16_t DeltaY = static_cast<int16_t> (MP->pos << *MPos);
+
+	int16_t DeltaX = static_cast<int16_t> (TheCurrentPiece->pos >> *TheSelectedPosition);
+	int16_t DeltaY = static_cast<int16_t> (TheCurrentPiece->pos << *TheSelectedPosition);
+
 	__RecMin rc = { 0 };
 
-	int16_t X = MP->pos.x + DeltaX;
-	int16_t Y = MP->pos.y + DeltaY;
+	int16_t X = TheCurrentPiece->pos.x + DeltaX;
+	int16_t Y = TheCurrentPiece->pos.y + DeltaY;
 
-	for (;((X > MPos->x) || (X < MPos->x) || (MP->pos.x == MPos->x))
-		&& ((Y > MPos->y) || (Y < MPos->y) || (MP->pos.y == MPos->y));X += DeltaX, Y += DeltaY)
+	for (;(((X != TheSelectedPosition->x) || DeltaX == 0) &&
+		((Y != TheSelectedPosition->y) || (DeltaY == 0)));
+		X += DeltaX, Y += DeltaY)
 	{
 		rc.x = X;
 		rc.y = Y;
 		for (int i = 0; i < 16; i++) {
-			if (rc == SetP[i].pos && SetP[i].state != UnActive) {
+			if (rc == SetofPiece[i].pos && SetofPiece[i].state != UnActive) {
 				return false;
 			}
-		}
-
-	}
-	X = MP->pos.x + DeltaX;
-	Y = MP->pos.y + DeltaY;
-	for (;((X > MPos->x) || (X < MPos->x) || (MP->pos.x == MPos->x))
-		&& ((Y > MPos->y) || (Y < MPos->y) || (MP->pos.y == MPos->y));X += DeltaX, Y += DeltaY)
-	{
-		rc.x = X;
-		rc.y = Y;
-		for (int i = 0; i < 16; i++) {
-			if (rc == SetP2[i].pos && SetP2[i].state != UnActive) {
+			if (rc == SetofPiece2[i].pos && SetofPiece2[i].state != UnActive) {
 				return false;
 			}
 		}
 	}
-
 	return true;
 }
 void TheRulesofcapture(
@@ -327,7 +319,7 @@ bool IsTheMoveValid(
 	int16_t DeltaX = static_cast<int16_t> (abs(CurrentPiece->pos.x - TheSelectedPosition->x));
 	int16_t DeltaY = static_cast<int16_t> (abs(CurrentPiece->pos.y - TheSelectedPosition->y));
 	int16_t PDeltaY = static_cast<int16_t>     (CurrentPiece->pos.y - TheSelectedPosition->y);
-	
+
 	switch (CurrentPiece->typ) {
 
 	case _Wp:
@@ -404,15 +396,28 @@ void TheRulesofChecks(
 )
 {
 	// Ray cast technique to check if the king is in check after a move
-	Piece* king = GetKing(SetofPiece);
+	Piece* king = GetKing(SetofPiece2);
+	Piece* king2 = GetKing(SetofPiece);
 	for (int index = 0;index < 16;index++) {
-		if (SetofPiece2[index].state != UnActive && SetofPiece2[index].typ != _Wk && SetofPiece2[index].typ != _Bk) {
-			if (IsTheMoveValid(&SetofPiece2[index], &king->pos, SetofPiece, SetofPiece2) &&
-				IsTherePieceInPath(&SetofPiece2[index], &king->pos, SetofPiece, SetofPiece2)) {
+
+		if (SetofPiece2[index].state != UnActive && 
+			SetofPiece2[index].typ != _Wk &&
+			SetofPiece2[index].typ != _Bk) {
+
+			if (IsTheMoveValid(&SetofPiece[index], &king->pos, SetofPiece2, SetofPiece) && IsTheMovePossible(&SetofPiece[index], &king->pos, SetofPiece2, SetofPiece)) {
 				if (king->typ == _Wk) {
 					*CurrentGameState = player_One_In_check;
 				}
 				else if (king->typ == _Bk) {
+					*CurrentGameState = player_Two_In_check;
+				}
+			}
+
+			if (IsTheMoveValid(&SetofPiece[index], &king2->pos, SetofPiece2, SetofPiece) && IsTheMovePossible(&SetofPiece[index], &king2->pos, SetofPiece2, SetofPiece)) {
+				if (king2->typ == _Wk) {
+					*CurrentGameState = player_One_In_check;
+				}
+				else if (king2->typ == _Bk) {
 					*CurrentGameState = player_Two_In_check;
 				}
 			}
@@ -423,33 +428,20 @@ bool TheMovementOfPieces(
 	Piece Setof16Piece[],
 	Board* BoardofChess_8X8size,
 	Piece Setof16Piece2[],
-	__Game CurrentGameState
+	__Game* CurrentGameState
 ) {
-	if (CurrentGameState == player_One_In_check || CurrentGameState == player_Two_In_check) {
-		Piece* king = GetKing(Setof16Piece);
-		king->state = Selected;
-		__RecMin* TheSelectedPosition = SelectPosition(*BoardofChess_8X8size);
 
-		if (TheSelectedPosition != nullptr && (king->pos != *TheSelectedPosition) &&
-			IsTheMoveValid(king, TheSelectedPosition, Setof16Piece2, Setof16Piece) &&
-			IsTherePieceInPath(king, TheSelectedPosition, Setof16Piece2, Setof16Piece)) {
-
-			TheRulesofcapture(TheSelectedPosition, Setof16Piece2);
-			king->IsMoved = true;
-			king->pos = *TheSelectedPosition;
-			king->state = Active;
-			TheRulesofChecks(Setof16Piece, Setof16Piece2, &CurrentGameState);
-			return true;
-		}
-
-		return false;
-	}
 	static Piece* CurrentPiece = nullptr; // Pointer_toPieceHadBeenSelected
 	Piece* NewPiece = nullptr; //Pointer_toPieceSelectedNow 
 	__RecMin* TheSelectedPosition = nullptr;
 
-	NewPiece = SelectPiece(Setof16Piece);
+	if (*CurrentGameState == player_One_In_check || *CurrentGameState == player_Two_In_check) {
+		NewPiece = GetKing(Setof16Piece);
+	}
+	else {
 
+		NewPiece = SelectPiece(Setof16Piece);
+	}
 	if (NewPiece != nullptr) {
 
 		if (CurrentPiece != nullptr) {
@@ -464,14 +456,19 @@ bool TheMovementOfPieces(
 		TheSelectedPosition = SelectPosition(*BoardofChess_8X8size);
 		if (TheSelectedPosition != nullptr && (CurrentPiece->pos != *TheSelectedPosition) &&
 			IsTheMoveValid(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece) &&
-			IsTherePieceInPath(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece)) {
+			IsTheMovePossible(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece)) {
 
 			TheRulesofcapture(TheSelectedPosition, Setof16Piece2);
 			CurrentPiece->IsMoved = true;
 			CurrentPiece->pos = *TheSelectedPosition;
 			CurrentPiece->state = Active;
+
+			TheRulesofChecks(
+				Setof16Piece,
+				Setof16Piece2,
+				CurrentGameState
+			);
 			CurrentPiece = nullptr;
-			TheRulesofChecks(Setof16Piece, Setof16Piece2, &CurrentGameState);
 			return true;
 		}
 	}
