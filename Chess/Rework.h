@@ -1,11 +1,14 @@
 #include <raylib.h>
 #include <stdint.h>
+#include <string>
 #include <math.h>
 #include <algorithm>
 #include <iostream>
 //square
 
-constexpr int Pixel = 90;
+
+
+constexpr float Pixel = 90;
 
 constexpr Color PieceSelectColor = { 74,84,45,255 };
 
@@ -18,14 +21,14 @@ constexpr Color RecDarkColor = { 238, 232, 213 ,255 };
 typedef Vector2 V2;
 typedef Texture Tex;
 
-V2 Vsum(V2 v1, V2 v2) {
+V2 VecSum(V2 v1, V2 v2) {
 	return{ v1.x + v2.x, v1.y + v2.y };
 }
 
 class Ray2 {
 public:
 
-	int Distance = 0;
+	float Distance = 0;
 	V2  bPos = { 0 };
 	V2  direction = { 0 };
 
@@ -40,9 +43,8 @@ public:
 		direction.y = Pixel * (dy / std::max(abs(dy), 1.0f));
 		// Calc The Distance In Pixel Uint
 		Distance = sqrtf((dx * dx) + (dy * dy));
-		// In Ray2 constructor:
 		Distance = !(dy && dx) ? Distance /= Pixel : Distance /= sqrtf(2) * Pixel;
-		
+		Distance = std::round(Distance);
 	};
 };
 
@@ -100,17 +102,18 @@ public:
 
 typedef enum PieceType
 {
-	_Wb,
+	_Wp,
 	_Wn,
+	_Wb,
 	_Wk,
 	_Wq,
-	_Wp,
 	_Wr,
-	_Bb,
+
+    _Bp,
 	_Bn,
+	_Bb,
 	_Bk,
 	_Bq,
-	_Bp,
 	_Br
 
 }_Ty;
@@ -137,16 +140,46 @@ typedef enum PieceState {
 
 }_Sta;
 
+Texture tex[12];
+
+std::string Path[12] = {
+	"C:\\Users\\Good\\Downloads\\picecs\\wp.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\wn.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\wb.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\wk.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\wq.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\wr.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\bp.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\bn.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\bb.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\bk.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\bq.png",
+	"C:\\Users\\Good\\Downloads\\picecs\\br.png"
+};
+
+void InitTexture() {
+	Image IMG = { 0 };
+	for (int i = 0; i < 12; i++) {
+		IMG = LoadImage(Path[i].c_str());
+		ImageResize(&IMG, (int)Pixel, (int)Pixel);
+		tex[i] = LoadTextureFromImage(IMG);
+	}
+	UnloadImage(IMG);
+}
+
+void deInitTexture() {
+	for (int i = 0; i < 12; i++) {
+		UnloadTexture(tex[i]);
+	}
+}
+
 class Piece {
 public:
 	sqar_t pos = { 0 };
 	_Ty Ty;
 	_Sta state = Active;
-	Tex tex;
 	bool IsMoved = 0;
-	~Piece() {
-		UnloadTexture(tex);
-	}
+	
 
 	bool RayCasting(sqar_t E, Piece arr[16] , Piece arr2[16])   {
 
@@ -158,9 +191,9 @@ public:
 
 		V2 Thechecker = Path.bPos;
 
-		for (int Move = 1 ; Move < Path.Distance ; Move++)
+		for (int Move = 1 ; Move < Path.Distance  ; Move++)
 		{
-			Thechecker = Vsum(Thechecker, Path.direction);
+			Thechecker = VecSum(Thechecker, Path.direction);
 
 			for (int PieceIndex = 0; PieceIndex < 16; PieceIndex++) {
 
@@ -177,36 +210,17 @@ public:
 
 	};
 
+	void Draw (Color color) const{
+		DrawTexture(tex[((int)(Ty))], (int)(pos.Pos.x), (int)(pos.Pos.y), color);
+	}
+
 	void set(sqar_t rec, _Ty ty) {
 		this->pos = rec;
 		this->Ty = ty;
-		std::string path = "picecs\\";
-		switch (Ty) {
-
-
-		case _Wp:  path += "wp.png";  break;
-		case _Wn:  path += "wn.png";  break;
-		case _Wb:  path += "wb.png";  break;
-		case _Wk:  path += "wk.png";  break;
-		case _Wq:  path += "wq.png";  break;
-		case _Wr:  path += "wr.png";  break;
-		case _Bp:  path += "bp.png";  break;
-		case _Bn:  path += "bn.png";  break;
-		case _Bb:  path += "bb.png";  break;
-		case _Br:  path += "br.png";  break;
-		case _Bk:  path += "bk.png";  break;
-		case _Bq:  path += "bq.png";  break;
-
-
-		}
-		Image TEX = LoadImage(path.c_str());
-		ImageResize(&TEX, Pixel, Pixel);
-		this->tex = LoadTextureFromImage(TEX);
-		UnloadImage(TEX);
 	};
 };
 
-void Init_16Piece(Board* Board, Piece Setof16Piece[], bool TypeofSet) {
+void InitSetPiece(Board* Board, Piece Setof16Piece[], bool TypeofSet) {
 	Setof16Piece[0].set((TypeofSet) ? Board->_Board[1][0] : Board->_Board[6][0], (TypeofSet) ? _Wp : _Bp);
 	Setof16Piece[1].set((TypeofSet) ? Board->_Board[1][1] : Board->_Board[6][1], (TypeofSet) ? _Wp : _Bp);
 	Setof16Piece[2].set((TypeofSet) ? Board->_Board[1][2] : Board->_Board[6][2], (TypeofSet) ? _Wp : _Bp);
@@ -228,18 +242,17 @@ void Init_16Piece(Board* Board, Piece Setof16Piece[], bool TypeofSet) {
 void DrawAllPieces(Piece Wpieces[], Piece Bpieces[]) {
 	for (int i = 0; i < 16;i++) {
 		if (Wpieces[i].state == Selected) {
-			DrawTexture(Wpieces[i].tex, Wpieces[i].pos.Pos.x, Wpieces[i].pos.Pos.y, PieceSelectColor);
+			Wpieces[i].Draw(PieceSelectColor);
 		}
 		else if (Wpieces[i].state == Active) {
-			DrawTexture(Wpieces[i].tex, Wpieces[i].pos.Pos.x, Wpieces[i].pos.Pos.y, WHITE);
+			Wpieces[i].Draw(WHITE);
 		}
 	}
 	for (int i = 0; i < 16;i++) {
 		if (Bpieces[i].state == Selected) {
-			DrawTexture(Bpieces[i].tex, Bpieces[i].pos.Pos.x, Bpieces[i].pos.Pos.y, PieceSelectColor);
-		}
+			Bpieces[i].Draw( PieceSelectColor);}
 		else if (Bpieces[i].state == Active) {
-			DrawTexture(Bpieces[i].tex, Bpieces[i].pos.Pos.x, Bpieces[i].pos.Pos.y, WHITE);
+			Bpieces[i].Draw( WHITE);
 		}
 	}
 }
@@ -265,7 +278,16 @@ sqar_t* SelectPosition(Board BoardofChess_8X8size) {
 	return nullptr;
 };
 
-void TheRulesofcapture(sqar_t* pos,Piece SetofPiece[]) {
+bool IstherePieceHere(sqar_t* pos,Piece SetofPiece2[]) {
+	for (int i = 0; i < 16;i++) {
+		if (SetofPiece2[i].pos == *pos && SetofPiece2[i].state != UnActive) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void CapturePiece(sqar_t* pos,Piece SetofPiece[]) {
 	for (int i = 0; i < 16;i++) {
 		if (SetofPiece[i].pos == *pos) {
 			SetofPiece[i].state = UnActive;
@@ -275,28 +297,30 @@ void TheRulesofcapture(sqar_t* pos,Piece SetofPiece[]) {
 	return;
 }
 
-bool IsTheMoveValid(Piece* CurrentPiece,sqar_t* TheSelectedPosition,Piece SetofPiece2[],Piece SetofPiece[])
+bool IsTheMoveValid(Piece* CurrentPiece,sqar_t* TheSelectedPosition,Piece TheAotherSet[],Piece CurrentPieceSet[])
 {
 	int16_t DeltaX = static_cast<int16_t> (abs(CurrentPiece->pos.Pos.x - TheSelectedPosition->Pos.x));
-	int16_t DeltaY = static_cast<int16_t> (abs(CurrentPiece->pos.Pos.y - TheSelectedPosition->Pos.y));
+	int16_t DeltaY = static_cast<int16_t> (abs(CurrentPiece->pos.Pos.y - TheSelect0edPosition->Pos.y));
 	int16_t PDeltaY = static_cast<int16_t>     (CurrentPiece->pos.Pos.y - TheSelectedPosition->Pos.y);
 
 	switch (CurrentPiece->Ty) {
 
 	case _Wp:
 		if (!(CurrentPiece->IsMoved)) {
-			if (DeltaX == 0 && ((PDeltaY == Pixel) || (PDeltaY == 2 * Pixel))) {
+			if ((DeltaX == 0 && ((PDeltaY == Pixel) || (PDeltaY == 2 * Pixel))) &&
+				!(IstherePieceHere(TheSelectedPosition, TheAotherSet) || IstherePieceHere(TheSelectedPosition, CurrentPieceSet))) {
 				return true;
 			}
-			else if (DeltaX == Pixel && PDeltaY == Pixel) {
+			else if ((DeltaX == Pixel && PDeltaY == Pixel) && IstherePieceHere(TheSelectedPosition, TheAotherSet)) {
 				return true;
 			}
 		}
 		else {
-			if (DeltaX == 0 && PDeltaY == Pixel) {
+			if ((DeltaX == 0 && PDeltaY == Pixel) &&
+				!(IstherePieceHere(TheSelectedPosition, TheAotherSet) || IstherePieceHere(TheSelectedPosition, CurrentPieceSet))) {
 				return true;
 			}
-			else if (DeltaX == Pixel && PDeltaY == Pixel) {
+			else if ((DeltaX == Pixel && PDeltaY == Pixel) && IstherePieceHere(TheSelectedPosition, TheAotherSet)) {
 				return true;
 			}
 		}
@@ -304,16 +328,19 @@ bool IsTheMoveValid(Piece* CurrentPiece,sqar_t* TheSelectedPosition,Piece SetofP
 		//BPawn
 	case _Bp:
 		if (!(CurrentPiece->IsMoved)) {
-			if (DeltaX == 0 && ((PDeltaY == -(Pixel)) || (PDeltaY == (-2) * Pixel))) {
+			if ((DeltaX == 0 && ((PDeltaY == -(Pixel)) || (PDeltaY == (-2) * Pixel)))&&
+				!(IstherePieceHere(TheSelectedPosition, TheAotherSet) || IstherePieceHere(TheSelectedPosition, CurrentPieceSet))) {
 				return true;
 			}
-			else if (DeltaX == (Pixel) && PDeltaY == (-Pixel)) {
+			else if ((DeltaX == (Pixel) && PDeltaY == (-Pixel)) && IstherePieceHere(TheSelectedPosition, TheAotherSet)) {
 				return true;
 			}
 		}
 		else {
-			if (DeltaX == 0 && PDeltaY == -(Pixel)) { return true; }
-			else if (DeltaX == (Pixel) && PDeltaY == (-Pixel)) {
+			if ((DeltaX == 0 && PDeltaY == -(Pixel))
+				&& !(IstherePieceHere(TheSelectedPosition, TheAotherSet) || IstherePieceHere(TheSelectedPosition, CurrentPieceSet)))
+			{ return true; }
+			else if ((DeltaX == (Pixel) && PDeltaY == (-Pixel)) && IstherePieceHere(TheSelectedPosition,TheAotherSet)) {
 				return true;
 			}
 		}
@@ -351,7 +378,7 @@ bool IsTheMoveValid(Piece* CurrentPiece,sqar_t* TheSelectedPosition,Piece SetofP
 	return false;
 }
 
-bool TheMovementOfPieces(Piece Setof16Piece[],Board* BoardofChess_8X8size,Piece Setof16Piece2[],__Game p) {
+bool TheMovement(Piece Setof16Piece[],Board* BoardofChess_8X8size,Piece Setof16Piece2[],__Game p) {
 
 	static Piece* CurrentPiece = nullptr; // Pointer_toPieceHadBeenSelected
 	Piece* NewPiece = nullptr; //Pointer_toPieceSelectedNow 
@@ -371,10 +398,10 @@ bool TheMovementOfPieces(Piece Setof16Piece[],Board* BoardofChess_8X8size,Piece 
 	if (CurrentPiece != nullptr) {
 		TheSelectedPosition = SelectPosition(*BoardofChess_8X8size);
 		if (TheSelectedPosition != nullptr && (CurrentPiece->pos != *TheSelectedPosition) &&
-			IsTheMoveValid(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece) &&
+			IsTheMoveValid(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece)&&
 			CurrentPiece->RayCasting(*TheSelectedPosition, Setof16Piece2, Setof16Piece)) {
 
-			TheRulesofcapture(TheSelectedPosition, Setof16Piece2);
+			CapturePiece(TheSelectedPosition, Setof16Piece2);
 			CurrentPiece->IsMoved = true;
 			CurrentPiece->pos = *TheSelectedPosition;
 			CurrentPiece->state = Active;

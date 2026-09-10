@@ -10,8 +10,9 @@ int main() {
 	Board BoardG;
 	__Game CurrentGameState = Player_One_Turn;
 	Piece Bpieces[16], Wpieces[16];
-	Init_16Piece(&BoardG, Wpieces, 1);
-	Init_16Piece(&BoardG, Bpieces, 0);
+	InitSetPiece(&BoardG, Wpieces, 1);
+	InitSetPiece(&BoardG, Bpieces, 0);
+    InitTexture();
 	while (!WindowShouldClose())
 	{
 		BeginDrawing();
@@ -21,13 +22,13 @@ int main() {
 
 
 		if (CurrentGameState == Player_One_Turn) {
-			if (TheMovementOfPieces(Wpieces, &BoardG, Bpieces, CurrentGameState)) {
+			if (TheMovement(Wpieces, &BoardG, Bpieces, CurrentGameState)) {
 				CurrentGameState = Player_Two_Turn;
 			}
 		}
 
 		else if (CurrentGameState == Player_Two_Turn) {
-			if (TheMovementOfPieces(Bpieces, &BoardG, Wpieces, CurrentGameState)) {
+			if (TheMovement(Bpieces, &BoardG, Wpieces, CurrentGameState)) {
 				CurrentGameState = Player_One_Turn;
 			}
 		}
@@ -40,6 +41,7 @@ int main() {
 		}
 		EndDrawing();
 	}
+	deInitTexture();
 	CloseWindow();
 	return 0;
 }
