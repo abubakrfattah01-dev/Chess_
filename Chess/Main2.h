@@ -135,7 +135,7 @@ public:
 		this->pos = rec;
 		this->typ = ty;
 
-		std::string path = "C:\\Users\\Good\\Downloads\\picecs\\";
+		std::string path = "picecs\\";
 		switch (typ) {
 
 
@@ -154,9 +154,7 @@ public:
 
 
 		}
-
 		Image TEX = LoadImage(path.c_str());
-		// Add this default ctor to explicitly initialize members
 		ImageResize(&TEX, Pixel, Pixel);
 		this->tex = LoadTextureFromImage(TEX);
 		UnloadImage(TEX);
@@ -248,6 +246,7 @@ Piece* GetKing(
 	}
 	return nullptr;
 }
+
 #pragma region movement 
 
 bool IstherePieceHere(
