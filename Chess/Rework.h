@@ -6,7 +6,19 @@
 #include <iostream>
 //square
 
+#define WorkMode 0
+#define Left 
+#define Right 
+#define long_C
+#define short_C
 
+namespace Window {
+	const char* Icon_local = "picecs\\wn.png";
+	constexpr int Pixal = 90;
+	constexpr int SrcWidth = (Pixal * 8);
+	constexpr int SrcHeigth = (Pixal * 8);
+	const char* Title = "Chess Game";
+}
 
 constexpr float Pixel = 90;
 
@@ -109,7 +121,7 @@ typedef enum PieceType
 	_Wq,
 	_Wr,
 
-    _Bp,
+	_Bp,
 	_Bn,
 	_Bb,
 	_Bk,
@@ -179,9 +191,9 @@ public:
 	_Ty Ty;
 	_Sta state = Active;
 	bool IsMoved = 0;
-	
 
-	bool RayCasting(sqar_t E, Piece arr[16] , Piece arr2[16])   {
+
+	bool RayCasting(sqar_t E, Piece arr[16], Piece arr2[16]) {
 
 		if (this->Ty == _Wn || this->Ty == _Bn) {
 			return true;
@@ -191,7 +203,7 @@ public:
 
 		V2 Thechecker = Path.bPos;
 
-		for (int Move = 1 ; Move < Path.Distance  ; Move++)
+		for (int Move = 1; Move < Path.Distance; Move++)
 		{
 			Thechecker = VecSum(Thechecker, Path.direction);
 
@@ -210,7 +222,7 @@ public:
 
 	};
 
-	void Draw (Color color) const{
+	void Draw(Color color) const {
 		DrawTexture(tex[((int)(Ty))], (int)(pos.Pos.x), (int)(pos.Pos.y), color);
 	}
 
@@ -221,6 +233,7 @@ public:
 };
 
 void InitSetPiece(Board* Board, Piece Setof16Piece[], bool TypeofSet) {
+
 	Setof16Piece[0].set((TypeofSet) ? Board->_Board[1][0] : Board->_Board[6][0], (TypeofSet) ? _Wp : _Bp);
 	Setof16Piece[1].set((TypeofSet) ? Board->_Board[1][1] : Board->_Board[6][1], (TypeofSet) ? _Wp : _Bp);
 	Setof16Piece[2].set((TypeofSet) ? Board->_Board[1][2] : Board->_Board[6][2], (TypeofSet) ? _Wp : _Bp);
@@ -229,6 +242,7 @@ void InitSetPiece(Board* Board, Piece Setof16Piece[], bool TypeofSet) {
 	Setof16Piece[5].set((TypeofSet) ? Board->_Board[1][5] : Board->_Board[6][5], (TypeofSet) ? _Wp : _Bp);
 	Setof16Piece[6].set((TypeofSet) ? Board->_Board[1][6] : Board->_Board[6][6], (TypeofSet) ? _Wp : _Bp);
 	Setof16Piece[7].set((TypeofSet) ? Board->_Board[1][7] : Board->_Board[6][7], (TypeofSet) ? _Wp : _Bp);
+
 	Setof16Piece[8].set((TypeofSet) ? Board->_Board[0][0] : Board->_Board[7][0], (TypeofSet) ? _Wr : _Br);
 	Setof16Piece[9].set((TypeofSet) ? Board->_Board[0][1] : Board->_Board[7][1], (TypeofSet) ? _Wn : _Bn);
 	Setof16Piece[10].set((TypeofSet) ? Board->_Board[0][2] : Board->_Board[7][2], (TypeofSet) ? _Wb : _Bb);
@@ -237,6 +251,7 @@ void InitSetPiece(Board* Board, Piece Setof16Piece[], bool TypeofSet) {
 	Setof16Piece[13].set((TypeofSet) ? Board->_Board[0][5] : Board->_Board[7][5], (TypeofSet) ? _Wb : _Bb);
 	Setof16Piece[14].set((TypeofSet) ? Board->_Board[0][6] : Board->_Board[7][6], (TypeofSet) ? _Wn : _Bn);
 	Setof16Piece[15].set((TypeofSet) ? Board->_Board[0][7] : Board->_Board[7][7], (TypeofSet) ? _Wr : _Br);
+
 }
 
 void DrawAllPieces(Piece Wpieces[], Piece Bpieces[]) {
@@ -250,9 +265,10 @@ void DrawAllPieces(Piece Wpieces[], Piece Bpieces[]) {
 	}
 	for (int i = 0; i < 16;i++) {
 		if (Bpieces[i].state == Selected) {
-			Bpieces[i].Draw( PieceSelectColor);}
+			Bpieces[i].Draw(PieceSelectColor);
+		}
 		else if (Bpieces[i].state == Active) {
-			Bpieces[i].Draw( WHITE);
+			Bpieces[i].Draw(WHITE);
 		}
 	}
 }
@@ -278,7 +294,7 @@ sqar_t* SelectPosition(Board BoardofChess_8X8size) {
 	return nullptr;
 };
 
-bool IstherePieceHere(sqar_t* pos,Piece SetofPiece2[]) {
+bool IstherePieceHere(sqar_t* pos, Piece SetofPiece2[]) {
 	for (int i = 0; i < 16;i++) {
 		if (SetofPiece2[i].pos == *pos && SetofPiece2[i].state != UnActive) {
 			return true;
@@ -287,7 +303,59 @@ bool IstherePieceHere(sqar_t* pos,Piece SetofPiece2[]) {
 	return false;
 }
 
-void CapturePiece(sqar_t* pos,Piece SetofPiece[]) {
+Piece* GetPiece(sqar_t* pos, Piece Set[]) {
+	for (int indexofPiece = 0; indexofPiece < 16; indexofPiece++) {
+		if (Set[indexofPiece].pos == *pos && Set[indexofPiece].state != UnActive) {
+			return &Set[indexofPiece];
+		}
+	}
+	return nullptr;
+};
+
+bool KingRookMove(bool type, Piece* king, Piece Set[]) {
+	sqar_t Pos = { 0 };
+	if (king->Ty == _Bk) {
+
+		if (type) {
+			Pos.Pos.x = 0;
+			Pos.Pos.y = Window::SrcHeigth;
+			Piece* p = GetPiece(&Pos, Set);
+			if (p != nullptr) {
+				return (!king->IsMoved) && (!p->IsMoved);
+			}
+		}
+		else {
+			Pos.Pos.x = Window::SrcWidth;
+			Pos.Pos.y = Window::SrcHeigth;
+			Piece* p = GetPiece(&Pos, Set);
+			if (p != nullptr) {
+				return (!king->IsMoved) && (!p->IsMoved);
+			}
+		}
+	}
+	else
+	{
+		if (type == false) {
+			Pos.Pos.x = 0;
+			Pos.Pos.y = 0;
+			Piece* p = GetPiece(&Pos, Set);
+			if (p != nullptr) {
+				return (!king->IsMoved) && (!p->IsMoved);
+			}
+		}
+		else {
+			Pos.Pos.x = Window::SrcWidth;
+			Pos.Pos.y = 0;
+			Piece* p = GetPiece(&Pos, Set);
+			if (p != nullptr) {
+				return (!king->IsMoved) && (!p->IsMoved);
+			}
+		}
+	}
+	return false;
+}
+
+void CapturePiece(sqar_t* pos, Piece SetofPiece[]) {
 	for (int i = 0; i < 16;i++) {
 		if (SetofPiece[i].pos == *pos) {
 			SetofPiece[i].state = UnActive;
@@ -297,14 +365,15 @@ void CapturePiece(sqar_t* pos,Piece SetofPiece[]) {
 	return;
 }
 
-bool IsTheMoveValid(Piece* CurrentPiece,sqar_t* TheSelectedPosition,Piece TheAotherSet[],Piece CurrentPieceSet[])
+bool IsTheMoveValid(Piece* CurrentPiece, sqar_t* TheSelectedPosition, Piece TheAotherSet[], Piece CurrentPieceSet[])
 {
-	int16_t DeltaX = static_cast<int16_t> (abs(CurrentPiece->pos.Pos.x - TheSelectedPosition->Pos.x));
-	int16_t DeltaY = static_cast<int16_t> (abs(CurrentPiece->pos.Pos.y - TheSelect0edPosition->Pos.y));
-	int16_t PDeltaY = static_cast<int16_t>     (CurrentPiece->pos.Pos.y - TheSelectedPosition->Pos.y);
+	int16_t DeltaX = (int16_t)(abs(CurrentPiece->pos.Pos.x - TheSelectedPosition->Pos.x));
+	int16_t DeltaY = (int16_t)(abs(CurrentPiece->pos.Pos.y - TheSelectedPosition->Pos.y));
+	int16_t PDeltaY = (int16_t)(CurrentPiece->pos.Pos.y - TheSelectedPosition->Pos.y);
+	int16_t PDeltaX = (int16_t)(CurrentPiece->pos.Pos.x - TheSelectedPosition->Pos.x);
 
 	switch (CurrentPiece->Ty) {
-
+#pragma region WP
 	case _Wp:
 		if (!(CurrentPiece->IsMoved)) {
 			if ((DeltaX == 0 && ((PDeltaY == Pixel) || (PDeltaY == 2 * Pixel))) &&
@@ -325,10 +394,11 @@ bool IsTheMoveValid(Piece* CurrentPiece,sqar_t* TheSelectedPosition,Piece TheAot
 			}
 		}
 		break;
-		//BPawn
+#pragma endregion
+#pragma region BP
 	case _Bp:
 		if (!(CurrentPiece->IsMoved)) {
-			if ((DeltaX == 0 && ((PDeltaY == -(Pixel)) || (PDeltaY == (-2) * Pixel)))&&
+			if ((DeltaX == 0 && ((PDeltaY == -(Pixel)) || (PDeltaY == (-2) * Pixel))) &&
 				!(IstherePieceHere(TheSelectedPosition, TheAotherSet) || IstherePieceHere(TheSelectedPosition, CurrentPieceSet))) {
 				return true;
 			}
@@ -339,46 +409,90 @@ bool IsTheMoveValid(Piece* CurrentPiece,sqar_t* TheSelectedPosition,Piece TheAot
 		else {
 			if ((DeltaX == 0 && PDeltaY == -(Pixel))
 				&& !(IstherePieceHere(TheSelectedPosition, TheAotherSet) || IstherePieceHere(TheSelectedPosition, CurrentPieceSet)))
-			{ return true; }
-			else if ((DeltaX == (Pixel) && PDeltaY == (-Pixel)) && IstherePieceHere(TheSelectedPosition,TheAotherSet)) {
+			{
+				return true;
+			}
+			else if ((DeltaX == (Pixel) && PDeltaY == (-Pixel)) && IstherePieceHere(TheSelectedPosition, TheAotherSet)) {
 				return true;
 			}
 		}
 		break;
-		//Bioshp
-	case _Wb:
-	case _Bb:
-		if (DeltaX == DeltaY) { return true; }
-		break;
-		//King
-	case _Wk:
-	case _Bk:
-		if ((DeltaX == Pixel || DeltaX == 0) && (DeltaY == Pixel || DeltaY == 0)) { return true; }
-		break;
-		//Queen
-	case _Wq:
-	case _Bq:
-		if (DeltaX == DeltaY) {
+#pragma endregion 
+
+	case _Wk:case _Bk:
+
+		if ((DeltaX == Pixel || DeltaX == 0) && (DeltaY == Pixel || DeltaY == 0)) {
 			return true;
 		}
-		else if ((DeltaX == 0 && DeltaY != 0) || (DeltaY == 0 && DeltaX != 0)) { return true; }
+
+		else if (DeltaY == 0 && PDeltaX == -2 * Pixel) short_C{
+			/*
+			* x = max , y = max
+			*/
+			sqar_t P2 {};
+		P2.Pos.x = Window::SrcWidth;
+		P2.Pos.y = Window::SrcHeigth;
+		P2.d2 = Pixel;
+		Piece* p = GetPiece(&P2, CurrentPieceSet);
+		  if ((p != nullptr) && (p->Ty == _Wr || p->Ty == _Br)) {
+			return (!p->IsMoved || !CurrentPiece->IsMoved);
+		  }
+			return false;
+		}
+
+		else if (DeltaY == 0 && PDeltaX == 2 * Pixel)long_C
+		{
+			/*
+			* x = max , y = 0
+			*/
+			return true;
+		}
+
 		break;
-		//King
-	case _Wr:
-	case _Br:
-		if ((DeltaX == 0 && DeltaY != 0) || (DeltaY == 0 && DeltaX != 0)) { return true; }
+#pragma region Queen
+	case _Wq:case _Bq:
+		if (DeltaX == DeltaY)
+		{
+			return true;
+		}
+		else if ((DeltaX == 0 && DeltaY != 0) ||
+			(DeltaY == 0 && DeltaX != 0))
+		{
+			return true;
+		}
 		break;
-		//Knight
-	case _Wn:
-	case _Bn:
-		if (DeltaX == 2 * Pixel && DeltaY == Pixel || (DeltaX == Pixel && DeltaY == 2 * Pixel)) { return true; }
+#pragma endregion
+#pragma region Rook
+	case _Wr:case _Br:
+		if ((DeltaX == 0 && DeltaY != 0) ||
+			(DeltaY == 0 && DeltaX != 0))
+		{
+			return true;
+		}
+		break;
+#pragma endregion
+#pragma region Knight
+	case _Wn:case _Bn:
+		if ((DeltaX == 2 * Pixel && DeltaY == Pixel) ||
+			(DeltaX == Pixel && DeltaY == 2 * Pixel))
+		{
+			return true;
+		}
+		break;
+#pragma endregion
+#pragma region Bioshp
+	case _Wb:case _Bb:
+		if (DeltaX == DeltaY)
+		{
+			return true;
+		}
 		break;
 	}
-
+#pragma endregion
 	return false;
 }
 
-bool TheMovement(Piece Setof16Piece[],Board* BoardofChess_8X8size,Piece Setof16Piece2[],__Game p) {
+bool TheMovement(Piece Setof16Piece[], Board* BoardofChess_8X8size, Piece Setof16Piece2[], __Game p) {
 
 	static Piece* CurrentPiece = nullptr; // Pointer_toPieceHadBeenSelected
 	Piece* NewPiece = nullptr; //Pointer_toPieceSelectedNow 
@@ -398,7 +512,7 @@ bool TheMovement(Piece Setof16Piece[],Board* BoardofChess_8X8size,Piece Setof16P
 	if (CurrentPiece != nullptr) {
 		TheSelectedPosition = SelectPosition(*BoardofChess_8X8size);
 		if (TheSelectedPosition != nullptr && (CurrentPiece->pos != *TheSelectedPosition) &&
-			IsTheMoveValid(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece)&&
+			IsTheMoveValid(CurrentPiece, TheSelectedPosition, Setof16Piece2, Setof16Piece) &&
 			CurrentPiece->RayCasting(*TheSelectedPosition, Setof16Piece2, Setof16Piece)) {
 
 			CapturePiece(TheSelectedPosition, Setof16Piece2);
@@ -413,12 +527,3 @@ bool TheMovement(Piece Setof16Piece[],Board* BoardofChess_8X8size,Piece Setof16P
 
 	return false;
 }
-
-namespace Window {
-	const char* Icon_local = "picecs\\wn.png";
-	constexpr int Pixal = 90;
-	constexpr int SrcWidth = (Pixal * 8);
-	constexpr int SrcHeigth = (Pixal * 8);
-	const char* Title = "Chess Game";
-}
-
